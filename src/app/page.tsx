@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useCarrito } from '@/context/CarritoContext';
+import { createClient } from '@/lib/supabase-browser';
 import type { Categoria, Producto } from '@/types';
 
 export default function Home() {
@@ -10,28 +11,37 @@ export default function Home() {
   const [productos, setProductos] = useState<Producto[]>([]);
   const [categoriaSeleccionada, setCategoriaSeleccionada] = useState<string | null>(null);
   const [carritoAbierto, setCarritoAbierto] = useState(false);
+  const [loading, setLoading] = useState(true);
   const { state, dispatch } = useCarrito();
+  const supabase = createClient();
 
   useEffect(() => {
-    // Demo data - replaces with Supabase fetch later
-    setCategorias([
-      { id: '1', nombre: 'Viandas', descripcion: 'Viandas semanales', imagen_url: null, activo: true, created_at: '' },
-      { id: '2', nombre: 'Ensaladas', descripcion: 'Ensaladas frescas', imagen_url: null, activo: true, created_at: '' },
-      { id: '3', nombre: 'Snacks', descripcion: 'Snacks saludables', imagen_url: null, activo: true, created_at: '' },
-    ]);
-    setProductos([
-      { id: '1', categoria_id: '1', nombre: 'Vianda Proteica', descripcion: 'Pollo, arroz integral y verduras', precio: 4500, imagen_url: null, activo: true, menu_semanal: true, created_at: '' },
-      { id: '2', categoria_id: '1', nombre: 'Vianda Vegetariana', descripcion: 'Tofu, quinoa y vegetales', precio: 4200, imagen_url: null, activo: true, menu_semanal: true, created_at: '' },
-      { id: '3', categoria_id: '2', nombre: 'Ensalada César', descripcion: 'Lechuga, croutons, pollo', precio: 3200, imagen_url: null, activo: true, menu_semanal: true, created_at: '' },
-      { id: '4', categoria_id: '3', nombre: 'Barrita Energética', descripcion: 'Mix de frutos secos', precio: 1500, imagen_url: null, activo: true, menu_semanal: true, created_at: '' },
-    ]);
+    async function fetchData() {
+      const [categoriasRes, productosRes] = await Promise.all([
+        supabase.from('categorias').select('*').eq('activo', true),
+        supabase.from('productos').select('*').eq('activo', true).eq('menu_semanal', true),
+      ]);
+
+      if (categoriasRes.data) setCategorias(categoriasRes.data);
+      if (productosRes.data) setProductos(productosRes.data);
+      setLoading(false);
+    }
+    fetchData();
   }, []);
 
   const productosFiltrados = categoriaSeleccionada
-    ? productos.filter(p => p.categoria_id === categoriaSeleccionada && p.activo && p.menu_semanal)
-    : productos.filter(p => p.activo && p.menu_semanal);
+    ? productos.filter(p => p.categoria_id === categoriaSeleccionada)
+    : productos;
 
   const total = state.reduce((acc, item) => acc + item.producto.precio * item.cantidad, 0);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-green-600 text-xl">Cargando...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -94,24 +104,32 @@ export default function Home() {
       {/* Productos */}
       <section className="max-w-6xl mx-auto px-4 py-8">
         <h3 className="text-2xl font-bold mb-6 text-gray-800">Menú de la Semana</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {productosFiltrados.map(producto => (
-            <div key={producto.id} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
-              <div className="bg-gray-200 border-2 border-dashed rounded-xl w-full h-48" />
-              <div className="p-4">
-                <h4 className="font-bold text-lg text-gray-800">{producto.nombre}</h4>
-                <p className="text-gray-600 text-sm mt-1">{producto.descripcion}</p>
-                <p className="text-green-600 font-bold text-xl mt-3">${producto.precio.toLocaleString()}</p>
-                <button
-                  onClick={() => dispatch({ type: 'AGREGAR', producto })}
-                  className="mt-3 w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition font-medium"
-                >
-                  Agregar al carrito
-                </button>
+        {productosFiltrados.length === 0 ? (
+          <p className="text-gray-500 text-center py-8">No hay productos disponibles</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {productosFiltrados.map(producto => (
+              <div key={producto.id} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition">
+                {producto.imagen_url ? (
+                  <img src={producto.imagen_url} alt={producto.nombre} className="w-full h-48 object-cover" />
+                ) : (
+                  <div className="bg-gray-200 border-2 border-dashed rounded-xl w-full h-48" />
+                )}
+                <div className="p-4">
+                  <h4 className="font-bold text-lg text-gray-800">{producto.nombre}</h4>
+                  <p className="text-gray-600 text-sm mt-1">{producto.descripcion}</p>
+                  <p className="text-green-600 font-bold text-xl mt-3">${producto.precio.toLocaleString()}</p>
+                  <button
+                    onClick={() => dispatch({ type: 'AGREGAR', producto })}
+                    className="mt-3 w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition font-medium"
+                  >
+                    Agregar al carrito
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Carrito Modal */}
