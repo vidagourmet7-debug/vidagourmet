@@ -23,7 +23,7 @@
 - [x] Inicializar Next.js 14 con App Router
 - [x] Configurar Supabase (auth + base de datos) - clientes, libs creadas
 - [x] Definir schema de tablas (productos, categorías, pedidos, clientes, ventas, compras)
-- [ ] Deploy inicial en Vercel
+- [x] Deploy inicial en Vercel (https://vidagourmet.vercel.app/)
 
 ### Fase 2 - Tienda Pública
 - [ ] Página de inicio con categorías

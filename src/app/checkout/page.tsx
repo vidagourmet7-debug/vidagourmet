@@ -33,7 +33,7 @@ export default function Checkout() {
       `%0A%0A*Total: $${total.toLocaleString()}*` +
       (formData.notas ? `%0A%0A*Notas:* ${formData.notas}` : '');
 
-    const telefonoWhatsApp = '5491100000000'; // Replace with Federico's number
+    const telefonoWhatsApp = '5491163052490';
     window.open(`https://wa.me/${telefonoWhatsApp}?text=${mensaje}`, '_blank');
 
     setLoading(false);
