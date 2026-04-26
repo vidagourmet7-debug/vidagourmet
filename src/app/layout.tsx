@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { CarritoProvider } from "@/context/CarritoContext";
+import { AuthProvider } from "@/context/AuthContext";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -29,7 +30,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <CarritoProvider>{children}</CarritoProvider>
+        <CarritoProvider>
+        <AuthProvider>{children}</AuthProvider>
+      </CarritoProvider>
       </body>
     </html>
   );

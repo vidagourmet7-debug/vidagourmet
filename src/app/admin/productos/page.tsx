@@ -1,21 +1,47 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import type { Producto, Categoria } from '@/types';
+import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/context/AuthContext';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
 
-export default function AdminProductos() {
-  const [productos] = useState<Producto[]>([
-    { id: '1', categoria_id: '1', nombre: 'Vianda Proteica', descripcion: 'Pollo, arroz integral y verduras', precio: 4500, imagen_url: null, activo: true, menu_semanal: true, created_at: '' },
-    { id: '2', categoria_id: '1', nombre: 'Vianda Vegetariana', descripcion: 'Tofu, quinoa y vegetales', precio: 4200, imagen_url: null, activo: true, menu_semanal: true, created_at: '' },
-    { id: '3', categoria_id: '2', nombre: 'Ensalada César', descripcion: 'Lechuga, croutons, pollo', precio: 3200, imagen_url: null, activo: true, menu_semanal: true, created_at: '' },
-  ]);
+function AdminProductosContent() {
+  const { signOut, user } = useAuth();
+  const [productos, setProductos] = useState<Producto[]>([]);
+  const [categorias, setCategorias] = useState<Categoria[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const [categorias] = useState<Categoria[]>([
-    { id: '1', nombre: 'Viandas', descripcion: '', imagen_url: null, activo: true, created_at: '' },
-    { id: '2', nombre: 'Ensaladas', descripcion: '', imagen_url: null, activo: true, created_at: '' },
-    { id: '3', nombre: 'Snacks', descripcion: '', imagen_url: null, activo: true, created_at: '' },
-  ]);
+  useEffect(() => {
+    async function fetchData() {
+      const client = supabase();
+      const [productosRes, categoriasRes] = await Promise.all([
+        client.from('productos').select('*').order('nombre'),
+        client.from('categorias').select('*').order('nombre'),
+      ]);
+
+      if (productosRes.data) setProductos(productosRes.data);
+      if (categoriasRes.data) setCategorias(categoriasRes.data);
+      setLoading(false);
+    }
+    fetchData();
+  }, []);
+
+  const eliminarProducto = async (id: string) => {
+    if (!confirm('¿Eliminar este producto?')) return;
+    const client = supabase();
+    await client.from('productos').delete().eq('id', id);
+    setProductos(productos.filter(p => p.id !== id));
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-gray-500">Cargando...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -28,7 +54,11 @@ export default function AdminProductos() {
               <Link href="/admin/pedidos" className="hover:text-green-400">Pedidos</Link>
             </nav>
           </div>
-          <Link href="/" className="text-gray-300 hover:text-white text-sm">Ver tienda</Link>
+          <div className="flex items-center gap-4">
+            <span className="text-gray-300 text-sm">{user?.email}</span>
+            <button onClick={signOut} className="text-gray-300 hover:text-white text-sm">Cerrar sesión</button>
+            <Link href="/" className="text-gray-300 hover:text-white text-sm">Ver tienda</Link>
+          </div>
         </div>
       </header>
 
@@ -75,14 +105,25 @@ export default function AdminProductos() {
                   </td>
                   <td className="px-6 py-4 text-right">
                     <button className="text-blue-600 hover:text-blue-800 mr-3">Editar</button>
-                    <button className="text-red-600 hover:text-red-800">Eliminar</button>
+                    <button onClick={() => eliminarProducto(producto.id)} className="text-red-600 hover:text-red-800">Eliminar</button>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
+          {productos.length === 0 && (
+            <div className="p-8 text-center text-gray-500">No hay productos</div>
+          )}
         </div>
       </main>
     </div>
+  );
+}
+
+export default function AdminProductos() {
+  return (
+    <ProtectedRoute>
+      <AdminProductosContent />
+    </ProtectedRoute>
   );
 }

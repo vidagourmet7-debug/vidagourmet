@@ -74,7 +74,18 @@ create table if not exists ventas (
   created_at timestamp with time zone default now()
 );
 
--- RLS Policies (Row Level Security)
+-- Admins (authorized admin users)
+create table if not exists admins (
+  id uuid default uuid_generate_v4() primary key,
+  email text not null unique,
+  created_at timestamp with time zone default now()
+);
+
+-- Admin write access (for authenticated users)
+create policy "Admin write admins" on admins for all using (true);
+
+-- Sample admin
+insert into admins (email) values ('vida.gourmet7@gmail.com');
 alter table categorias enable row level security;
 alter table productos enable row level security;
 alter table clientes enable row level security;

@@ -1,18 +1,45 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import type { Pedido } from '@/types';
+import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/context/AuthContext';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
 
-export default function AdminPedidos() {
-  const [pedidos] = useState<Pedido[]>([
-    { id: '1', cliente_id: '1', estado: 'pendiente', fecha_entrega: '2026-04-21', total: 8700, notas: 'Sin cebolla', created_at: '2026-04-20T10:00:00' },
-    { id: '2', cliente_id: '2', estado: 'confirmado', fecha_entrega: '2026-04-22', total: 4500, notas: null, created_at: '2026-04-20T11:00:00' },
-    { id: '3', cliente_id: '3', estado: 'entregado', fecha_entrega: '2026-04-20', total: 3200, notas: 'Dejar en portería', created_at: '2026-04-19T15:00:00' },
-  ]);
+type PedidoConCliente = Pedido & {
+  clientes?: { nombre: string; telefono: string };
+};
 
+function AdminPedidosContent() {
+  const { signOut, user } = useAuth();
+  const [pedidos, setPedidos] = useState<PedidoConCliente[]>([]);
+  const [loading, setLoading] = useState(true);
   const [filtroEstado, setFiltroEstado] = useState<string>('todos');
   const [filtroFecha, setFiltroFecha] = useState<string>('');
+
+  useEffect(() => {
+    async function fetchPedidos() {
+      const client = supabase();
+      const { data } = await client
+        .from('pedidos')
+        .select(`
+          *,
+          clientes (nombre, telefono)
+        `)
+        .order('fecha_entrega', { ascending: false });
+
+      if (data) setPedidos(data);
+      setLoading(false);
+    }
+    fetchPedidos();
+  }, []);
+
+  const cambiarEstado = async (pedidoId: string, nuevoEstado: Pedido['estado']) => {
+    const client = supabase();
+    await client.from('pedidos').update({ estado: nuevoEstado }).eq('id', pedidoId);
+    setPedidos(pedidos.map(p => p.id === pedidoId ? { ...p, estado: nuevoEstado } : p));
+  };
 
   const pedidosFiltrados = pedidos.filter(pedido => {
     if (filtroEstado !== 'todos' && pedido.estado !== filtroEstado) return false;
@@ -20,9 +47,13 @@ export default function AdminPedidos() {
     return true;
   });
 
-  const cambiarEstado = (pedidoId: string, nuevoEstado: Pedido['estado']) => {
-    console.log(`Cambiando pedido ${pedidoId} a ${nuevoEstado}`);
-  };
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-gray-500">Cargando...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -35,7 +66,11 @@ export default function AdminPedidos() {
               <Link href="/admin/pedidos" className="text-green-400">Pedidos</Link>
             </nav>
           </div>
-          <Link href="/" className="text-gray-300 hover:text-white text-sm">Ver tienda</Link>
+          <div className="flex items-center gap-4">
+            <span className="text-gray-300 text-sm">{user?.email}</span>
+            <button onClick={signOut} className="text-gray-300 hover:text-white text-sm">Cerrar sesión</button>
+            <Link href="/" className="text-gray-300 hover:text-white text-sm">Ver tienda</Link>
+          </div>
         </div>
       </header>
 
@@ -68,6 +103,7 @@ export default function AdminPedidos() {
             <thead className="bg-gray-50 border-b">
               <tr>
                 <th className="text-left px-6 py-3 text-gray-600 font-medium">ID</th>
+                <th className="text-left px-6 py-3 text-gray-600 font-medium">Cliente</th>
                 <th className="text-left px-6 py-3 text-gray-600 font-medium">Fecha entrega</th>
                 <th className="text-left px-6 py-3 text-gray-600 font-medium">Total</th>
                 <th className="text-center px-6 py-3 text-gray-600 font-medium">Estado</th>
@@ -78,6 +114,10 @@ export default function AdminPedidos() {
               {pedidosFiltrados.map(pedido => (
                 <tr key={pedido.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 text-gray-600 font-mono text-sm">#{pedido.id.slice(0, 8)}</td>
+                  <td className="px-6 py-4">
+                    <div className="text-gray-800">{pedido.clientes?.nombre || 'N/A'}</div>
+                    <div className="text-sm text-gray-500">{pedido.clientes?.telefono || ''}</div>
+                  </td>
                   <td className="px-6 py-4 text-gray-600">{pedido.fecha_entrega}</td>
                   <td className="px-6 py-4 text-gray-600 font-medium">${pedido.total.toLocaleString()}</td>
                   <td className="px-6 py-4 text-center">
@@ -119,5 +159,13 @@ export default function AdminPedidos() {
         </div>
       </main>
     </div>
+  );
+}
+
+export default function AdminPedidos() {
+  return (
+    <ProtectedRoute>
+      <AdminPedidosContent />
+    </ProtectedRoute>
   );
 }

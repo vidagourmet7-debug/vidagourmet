@@ -2,27 +2,55 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/context/AuthContext';
+import { useEffect } from 'react';
 
 export default function AdminLogin() {
   const router = useRouter();
+  const { user, loading: authLoading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (user && !authLoading) {
+      router.push('/admin/productos');
+    }
+  }, [user, authLoading, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
-    // Demo login - replace with Supabase auth
-    if (email === 'admin@vidagourmet.com' && password === 'admin123') {
-      router.push('/admin/productos');
-    } else {
+    const client = supabase();
+    const { data, error: signInError } = await client.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (signInError) {
       setError('Credenciales incorrectas');
+      setLoading(false);
+      return;
     }
-    setLoading(false);
+
+    if (data.user) {
+      router.push('/admin/productos');
+    }
   };
+
+  // Show loading while checking auth
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-gray-500">Cargando...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
