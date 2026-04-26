@@ -115,6 +115,7 @@ function AdminProductosContent() {
             <nav className="flex gap-4 text-sm">
               <Link href="/admin/productos" className="text-green-400">Productos</Link>
               <Link href="/admin/pedidos" className="hover:text-green-400">Pedidos</Link>
+              <Link href="/admin/caja" className="hover:text-green-400">Caja</Link>
             </nav>
           </div>
           <div className="flex items-center gap-4">

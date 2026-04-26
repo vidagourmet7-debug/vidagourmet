@@ -45,9 +45,9 @@
 - [x] Notificación WhatsApp al confirmar
 
 ### Fase 5 - Gestión de Caja
-- [ ] Registro automático de ventas
-- [ ] Registro manual de compras
-- [ ] Dashboard ingresos/gastos
+- [x] Registro automático de ventas
+- [x] Registro manual de compras
+- [x] Dashboard ingresos/gastos
 
 ## Database Schema (Supabase)
 

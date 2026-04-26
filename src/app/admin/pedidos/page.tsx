@@ -54,6 +54,17 @@ function AdminPedidosContent() {
       const telLimpio = telefono.replace(/\D/g, '');
       window.open(`https://wa.me/${telLimpio}?text=${encodeURIComponent(mensaje)}`, '_blank');
     }
+
+    if (nuevoEstado === 'entregado') {
+      const pedido = pedidos.find(p => p.id === pedidoId);
+      if (pedido) {
+        await client.from('ventas').insert({
+          pedido_id: pedidoId,
+          monto: pedido.total,
+          fecha: new Date().toISOString().split('T')[0],
+        });
+      }
+    }
   };
 
   const toggleExpandir = (pedidoId: string) => {
