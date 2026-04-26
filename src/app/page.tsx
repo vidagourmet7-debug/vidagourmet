@@ -368,12 +368,12 @@ export default function Home() {
       <footer className="bg-[#1A1A1A] text-white py-16 relative z-10">
         <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-8 items-center">
           <div>
-            <div className="mb-6 bg-white inline-block p-4 rounded-3xl shadow-lg">
+            <div className="mb-6 inline-block">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img 
                 src="/logo.png" 
                 alt="Vida Gourmet" 
-                className="h-20 w-auto object-contain"
+                className="h-24 w-auto object-contain drop-shadow-md"
                 onError={(e) => {
                   e.currentTarget.style.display = 'none';
                   const nextSibling = e.currentTarget.nextElementSibling as HTMLElement;
