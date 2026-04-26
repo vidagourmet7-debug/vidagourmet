@@ -6,27 +6,90 @@ import type { Producto, Categoria } from '@/types';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/context/AuthContext';
 import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { ProductForm, type ProductoFormData } from '@/components/ProductForm';
 
 function AdminProductosContent() {
   const { signOut, user } = useAuth();
   const [productos, setProductos] = useState<Producto[]>([]);
   const [categorias, setCategorias] = useState<Categoria[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [editProducto, setEditProducto] = useState<Producto | null>(null);
 
   useEffect(() => {
-    async function fetchData() {
-      const client = supabase();
-      const [productosRes, categoriasRes] = await Promise.all([
-        client.from('productos').select('*').order('nombre'),
-        client.from('categorias').select('*').order('nombre'),
-      ]);
-
-      if (productosRes.data) setProductos(productosRes.data);
-      if (categoriasRes.data) setCategorias(categoriasRes.data);
-      setLoading(false);
-    }
     fetchData();
   }, []);
+
+  async function fetchData() {
+    const client = supabase();
+    const [productosRes, categoriasRes] = await Promise.all([
+      client.from('productos').select('*').order('nombre'),
+      client.from('categorias').select('*').order('nombre'),
+    ]);
+
+    if (productosRes.data) setProductos(productosRes.data);
+    if (categoriasRes.data) setCategorias(categoriasRes.data);
+    setLoading(false);
+  }
+
+  const handleSave = async (data: ProductoFormData) => {
+    const client = supabase();
+
+    if (editProducto) {
+      const { error } = await client
+        .from('productos')
+        .update({
+          nombre: data.nombre,
+          descripcion: data.descripcion,
+          precio: data.precio,
+          categoria_id: data.categoria_id,
+          activo: data.activo,
+          menu_semanal: data.menu_semanal,
+        })
+        .eq('id', editProducto.id);
+
+      if (!error) {
+        setProductos(productos.map(p =>
+          p.id === editProducto.id ? { ...p, ...data } : p
+        ));
+      }
+    } else {
+      const { data: newProducto, error } = await client
+        .from('productos')
+        .insert({
+          nombre: data.nombre,
+          descripcion: data.descripcion,
+          precio: data.precio,
+          categoria_id: data.categoria_id,
+          activo: data.activo,
+          menu_semanal: data.menu_semanal,
+        })
+        .select()
+        .single();
+
+      if (!error && newProducto) {
+        setProductos([...productos, newProducto]);
+      }
+    }
+
+    setShowForm(false);
+    setEditProducto(null);
+  };
+
+  const handleEdit = (producto: Producto) => {
+    setEditProducto(producto);
+    setShowForm(true);
+  };
+
+  const handleNew = () => {
+    setEditProducto(null);
+    setShowForm(true);
+  };
+
+  const handleClose = () => {
+    setShowForm(false);
+    setEditProducto(null);
+  };
 
   const eliminarProducto = async (id: string) => {
     if (!confirm('¿Eliminar este producto?')) return;
@@ -65,7 +128,10 @@ function AdminProductosContent() {
       <main className="max-w-6xl mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold text-gray-800">Productos</h2>
-          <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition">
+          <button
+            onClick={handleNew}
+            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition"
+          >
             + Nuevo producto
           </button>
         </div>
@@ -104,8 +170,15 @@ function AdminProductosContent() {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <button className="text-blue-600 hover:text-blue-800 mr-3">Editar</button>
-                    <button onClick={() => eliminarProducto(producto.id)} className="text-red-600 hover:text-red-800">Eliminar</button>
+                    <button
+                      onClick={() => handleEdit(producto)}
+                      className="text-blue-600 hover:text-blue-800 mr-3"
+                    >
+                      Editar
+                    </button>
+                    <button onClick={() => eliminarProducto(producto.id)} className="text-red-600 hover:text-red-800">
+                      Eliminar
+                    </button>
                   </td>
                 </tr>
               ))}
@@ -116,6 +189,15 @@ function AdminProductosContent() {
           )}
         </div>
       </main>
+
+      {showForm && (
+        <ProductForm
+          producto={editProducto || undefined}
+          categorias={categorias}
+          onSave={handleSave}
+          onClose={handleClose}
+        />
+      )}
     </div>
   );
 }
