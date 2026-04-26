@@ -39,10 +39,10 @@
 - [ ] Menú semanal (publicar/despublicar por semana)
 
 ### Fase 4 - Panel Admin (Pedidos)
-- [ ] Vista de pedidos (día/semana)
-- [ ] Estados: pendiente → confirmado → entregado
-- [ ] Filtros por fecha y estado
-- [ ] Notificación WhatsApp al confirmar
+- [x] Vista de pedidos (día/semana)
+- [x] Estados: pendiente → confirmado → entregado
+- [x] Filtros por fecha y estado
+- [x] Notificación WhatsApp al confirmar
 
 ### Fase 5 - Gestión de Caja
 - [ ] Registro automático de ventas
