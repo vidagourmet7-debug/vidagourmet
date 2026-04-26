@@ -69,14 +69,14 @@ export default function Home() {
       <div className="absolute top-0 right-0 w-[50%] h-[800px] bg-brand-olive rounded-bl-[200px] -z-0 transform translate-x-12 -translate-y-12"></div>
       
       {/* Navbar */}
-      <nav className="relative z-10 max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
+      <nav className="relative z-10 max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         {/* Logo */}
-        <div className="flex items-center gap-1 cursor-pointer">
+        <div className="flex items-center cursor-pointer">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img 
             src="/logo.png" 
             alt="Vida Gourmet" 
-            className="h-16 object-contain"
+            className="h-28 w-auto object-contain scale-125 origin-left"
             onError={(e) => {
               // Fallback if logo.png is not found
               e.currentTarget.style.display = 'none';
@@ -365,15 +365,15 @@ export default function Home() {
       )}
 
       {/* Footer */}
-      <footer className="bg-[#1A1A1A] text-white py-12 relative z-10">
+      <footer className="bg-[#1A1A1A] text-white py-16 relative z-10">
         <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-8 items-center">
           <div>
-            <div className="flex items-center gap-1 mb-4 bg-white/10 p-2 rounded-xl inline-block">
+            <div className="mb-6 bg-white inline-block p-4 rounded-3xl shadow-lg">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img 
                 src="/logo.png" 
                 alt="Vida Gourmet" 
-                className="h-12 object-contain filter brightness-0 invert"
+                className="h-20 w-auto object-contain"
                 onError={(e) => {
                   e.currentTarget.style.display = 'none';
                   const nextSibling = e.currentTarget.nextElementSibling as HTMLElement;
@@ -385,7 +385,7 @@ export default function Home() {
                 <span className="text-3xl font-cursive text-brand-olive -ml-2 mt-2">Gourmet</span>
               </div>
             </div>
-            <p className="text-gray-400 max-w-sm mt-4">
+            <p className="text-gray-400 max-w-sm text-lg">
               Preparando viandas saludables con amor, para que tú solo te preocupes por disfrutar.
             </p>
           </div>
