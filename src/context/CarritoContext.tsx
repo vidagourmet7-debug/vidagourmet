@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useReducer, type ReactNode } from 'react';
+import { createContext, useContext, useReducer, useEffect, type ReactNode } from 'react';
 import type { CarritoItem, Producto } from '@/types';
 
 type CarritoState = CarritoItem[];
@@ -9,7 +9,10 @@ type CarritoAction =
   | { type: 'AGREGAR'; producto: Producto; cantidad?: number }
   | { type: 'QUITAR'; productoId: string }
   | { type: 'ACTUALIZAR_CANTIDAD'; productoId: string; cantidad: number }
-  | { type: 'VACIAR' };
+  | { type: 'VACIAR' }
+  | { type: 'CARGAR'; items: CarritoItem[] };
+
+const STORAGE_KEY = 'vidagourmet_carrito';
 
 function carritoReducer(state: CarritoState, action: CarritoAction): CarritoState {
   switch (action.type) {
@@ -34,6 +37,8 @@ function carritoReducer(state: CarritoState, action: CarritoAction): CarritoStat
       );
     case 'VACIAR':
       return [];
+    case 'CARGAR':
+      return action.items;
     default:
       return state;
   }
@@ -46,6 +51,22 @@ const CarritoContext = createContext<{
 
 export function CarritoProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(carritoReducer, []);
+
+  useEffect(() => {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      try {
+        const items = JSON.parse(stored) as CarritoItem[];
+        dispatch({ type: 'CARGAR', items });
+      } catch {
+        localStorage.removeItem(STORAGE_KEY);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }, [state]);
 
   return (
     <CarritoContext.Provider value={{ state, dispatch }}>

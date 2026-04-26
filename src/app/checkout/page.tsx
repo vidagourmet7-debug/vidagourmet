@@ -3,10 +3,12 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useCarrito } from '@/context/CarritoContext';
+import { createClient } from '@/lib/supabase-browser';
 
 export default function Checkout() {
   const router = useRouter();
-  const { state } = useCarrito();
+  const { state, dispatch } = useCarrito();
+  const supabase = createClient();
   const [formData, setFormData] = useState({
     nombre: '',
     telefono: '',
@@ -22,22 +24,83 @@ export default function Checkout() {
     e.preventDefault();
     setLoading(true);
 
-    const mensaje = `*Nuevo Pedido - Vida Gourmet*%0A%0A` +
-      `*Datos del cliente:*%0A` +
-      `Nombre: ${formData.nombre}%0A` +
-      `Teléfono: ${formData.telefono}%0A` +
-      `Dirección: ${formData.direccion}%0A` +
-      `Fecha de entrega: ${formData.fechaEntrega}%0A%0A` +
-      `*Pedido:*%0A` +
-      state.map(item => `- ${item.producto.nombre} x${item.cantidad} = $${(item.producto.precio * item.cantidad).toLocaleString()}`).join('%0A') +
-      `%0A%0A*Total: $${total.toLocaleString()}*` +
-      (formData.notas ? `%0A%0A*Notas:* ${formData.notas}` : '');
+    try {
+      // 1. Create or get cliente
+      let clienteId: string;
+      const { data: clienteExistente } = await supabase
+        .from('clientes')
+        .select('id')
+        .eq('telefono', formData.telefono)
+        .maybeSingle();
 
-    const telefonoWhatsApp = '5491163052490';
-    window.open(`https://wa.me/${telefonoWhatsApp}?text=${mensaje}`, '_blank');
+      if (clienteExistente) {
+        clienteId = clienteExistente.id;
+      } else {
+        const { data: nuevoCliente, error: clienteError } = await supabase
+          .from('clientes')
+          .insert({
+            nombre: formData.nombre,
+            telefono: formData.telefono,
+            direccion: formData.direccion,
+          })
+          .select('id')
+          .single();
 
-    setLoading(false);
-    router.push('/confirmacion');
+        if (clienteError) throw clienteError;
+        clienteId = nuevoCliente.id;
+      }
+
+      // 2. Create pedido
+      const { data: pedido, error: pedidoError } = await supabase
+        .from('pedidos')
+        .insert({
+          cliente_id: clienteId,
+          estado: 'pendiente',
+          fecha_entrega: formData.fechaEntrega,
+          total,
+          notas: formData.notas || null,
+        })
+        .select('id')
+        .single();
+
+      if (pedidoError) throw pedidoError;
+
+      // 3. Create pedido items
+      const pedidoItems = state.map(item => ({
+        pedido_id: pedido.id,
+        producto_id: item.producto.id,
+        cantidad: item.cantidad,
+        precio_unitario: item.producto.precio,
+      }));
+
+      const { error: itemsError } = await supabase
+        .from('pedido_items')
+        .insert(pedidoItems);
+
+      if (itemsError) throw itemsError;
+
+      // 4. Open WhatsApp
+      const mensaje = `*Nuevo Pedido - Vida Gourmet*%0A%0A` +
+        `*Datos del cliente:*%0A` +
+        `Nombre: ${formData.nombre}%0A` +
+        `Teléfono: ${formData.telefono}%0A` +
+        `Dirección: ${formData.direccion}%0A` +
+        `Fecha de entrega: ${formData.fechaEntrega}%0A%0A` +
+        `*Pedido:*%0A` +
+        state.map(item => `- ${item.producto.nombre} x${item.cantidad} = $${(item.producto.precio * item.cantidad).toLocaleString()}`).join('%0A') +
+        `%0A%0A*Total: $${total.toLocaleString()}*` +
+        (formData.notas ? `%0A%0A*Notas:* ${formData.notas}` : '');
+
+      const telefonoWhatsApp = '5491163052490';
+      window.open(`https://wa.me/${telefonoWhatsApp}?text=${mensaje}`, '_blank');
+
+      // 5. Clear cart and redirect
+      dispatch({ type: 'VACIAR' });
+      router.push('/confirmacion');
+    } catch (error) {
+      console.error('Error al guardar pedido:', error);
+      setLoading(false);
+    }
   };
 
   if (state.length === 0) {
