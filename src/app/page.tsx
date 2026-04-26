@@ -72,13 +72,27 @@ export default function Home() {
       <nav className="relative z-10 max-w-7xl mx-auto px-6 py-6 flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center gap-1 cursor-pointer">
-          <span className="text-2xl font-black text-brand-peach tracking-wider">VIDA</span>
-          <span className="text-3xl font-cursive text-brand-olive -ml-2 mt-2">Gourmet</span>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img 
+            src="/logo.png" 
+            alt="Vida Gourmet" 
+            className="h-16 object-contain"
+            onError={(e) => {
+              // Fallback if logo.png is not found
+              e.currentTarget.style.display = 'none';
+              const nextSibling = e.currentTarget.nextElementSibling as HTMLElement;
+              if (nextSibling) nextSibling.style.display = 'flex';
+            }}
+          />
+          <div className="hidden items-center gap-1">
+            <span className="text-2xl font-black text-brand-peach tracking-wider">VIDA</span>
+            <span className="text-3xl font-cursive text-brand-olive -ml-2 mt-2">Gourmet</span>
+          </div>
         </div>
 
         {/* Links */}
-        <div className="hidden md:flex items-center gap-8 font-medium text-gray-700">
-          <button className="text-brand-olive font-bold">Inicio</button>
+        <div className="hidden md:flex items-center gap-8 font-bold text-gray-900">
+          <button className="text-brand-olive">Inicio</button>
           <a href="#menu" className="hover:text-brand-olive transition-colors">Menú</a>
           <button className="hover:text-brand-olive transition-colors">Nosotros</button>
           <button className="hover:text-brand-olive transition-colors">Contacto</button>
@@ -86,12 +100,12 @@ export default function Home() {
 
         {/* Actions */}
         <div className="flex items-center gap-4">
-          <button className="p-2 text-brand-oliveLight hover:text-brand-olive transition-colors bg-white rounded-full shadow-sm">
+          <button className="p-2 text-brand-olive hover:text-brand-oliveDark transition-colors bg-white rounded-full shadow-sm">
             <SearchIcon />
           </button>
           <button 
             onClick={() => setCarritoAbierto(true)}
-            className="p-2 text-brand-oliveLight hover:text-brand-olive transition-colors bg-white rounded-full shadow-sm relative"
+            className="p-2 text-brand-olive hover:text-brand-oliveDark transition-colors bg-white rounded-full shadow-sm relative"
           >
             <CartIcon />
             {state.length > 0 && (
@@ -354,11 +368,24 @@ export default function Home() {
       <footer className="bg-[#1A1A1A] text-white py-12 relative z-10">
         <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-8 items-center">
           <div>
-            <div className="flex items-center gap-1 mb-4">
-              <span className="text-2xl font-black text-brand-peach tracking-wider">VIDA</span>
-              <span className="text-3xl font-cursive text-brand-olive -ml-2 mt-2">Gourmet</span>
+            <div className="flex items-center gap-1 mb-4 bg-white/10 p-2 rounded-xl inline-block">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img 
+                src="/logo.png" 
+                alt="Vida Gourmet" 
+                className="h-12 object-contain filter brightness-0 invert"
+                onError={(e) => {
+                  e.currentTarget.style.display = 'none';
+                  const nextSibling = e.currentTarget.nextElementSibling as HTMLElement;
+                  if (nextSibling) nextSibling.style.display = 'flex';
+                }}
+              />
+              <div className="hidden items-center gap-1">
+                <span className="text-2xl font-black text-brand-peach tracking-wider">VIDA</span>
+                <span className="text-3xl font-cursive text-brand-olive -ml-2 mt-2">Gourmet</span>
+              </div>
             </div>
-            <p className="text-gray-400 max-w-sm">
+            <p className="text-gray-400 max-w-sm mt-4">
               Preparando viandas saludables con amor, para que tú solo te preocupes por disfrutar.
             </p>
           </div>
