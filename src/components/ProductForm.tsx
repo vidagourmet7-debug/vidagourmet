@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Image from 'next/image';
 import type { Producto, Categoria } from '@/types';
 
 type ProductFormProps = {
@@ -129,7 +130,7 @@ export function ProductForm({ producto, categorias, onSave, onClose }: ProductFo
               <label className="block text-gray-700 font-medium mb-1">Imagen</label>
               {formData.imagen_url && (
                 <div className="mb-2">
-                  <img src={formData.imagen_url} alt="Preview" className="w-32 h-32 object-cover rounded-lg" />
+                  <Image src={formData.imagen_url} alt="Preview" width={128} height={128} className="w-32 h-32 object-cover rounded-lg" />
                   <button
                     type="button"
                     onClick={() => setFormData({ ...formData, imagen_url: null })}

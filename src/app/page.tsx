@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useCarrito } from '@/context/CarritoContext';
 import { createClient } from '@/lib/supabase-browser';
 import type { Categoria, Producto } from '@/types';
@@ -72,13 +73,13 @@ export default function Home() {
       <nav className="relative z-10 max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
         {/* Logo */}
         <div className="flex items-center cursor-pointer">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img 
-            src="/logo.png" 
-            alt="Vida Gourmet" 
+          <Image
+            src="/logo.png"
+            alt="Vida Gourmet"
+            width={112}
+            height={112}
             className="h-28 w-auto object-contain scale-125 origin-left"
             onError={(e) => {
-              // Fallback if logo.png is not found
               e.currentTarget.style.display = 'none';
               const nextSibling = e.currentTarget.nextElementSibling as HTMLElement;
               if (nextSibling) nextSibling.style.display = 'flex';
@@ -208,8 +209,13 @@ export default function Home() {
                 {/* Circular image sticking out top */}
                 <div className="absolute -top-16 w-32 h-32 rounded-full border-[6px] border-white shadow-lg overflow-hidden bg-brand-peachLight/20">
                   {producto.imagen_url ? (
-                    /* eslint-disable-next-line @next/next/no-img-element */
-                    <img src={producto.imagen_url} alt={producto.nombre} className="w-full h-full object-cover" />
+                    <Image
+                      src={producto.imagen_url}
+                      alt={producto.nombre}
+                      width={128}
+                      height={128}
+                      className="w-full h-full object-cover"
+                    />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-brand-peach font-bold">Sin foto</div>
                   )}
@@ -303,8 +309,13 @@ export default function Home() {
                       <div key={item.producto.id} className="flex gap-4 items-center">
                         <div className="w-16 h-16 rounded-2xl overflow-hidden bg-gray-100 shrink-0">
                           {item.producto.imagen_url ? (
-                            /* eslint-disable-next-line @next/next/no-img-element */
-                            <img src={item.producto.imagen_url} alt={item.producto.nombre} className="w-full h-full object-cover" />
+                            <Image
+                              src={item.producto.imagen_url}
+                              alt={item.producto.nombre}
+                              width={64}
+                              height={64}
+                              className="w-full h-full object-cover"
+                            />
                           ) : (
                             <div className="w-full h-full bg-brand-peachLight/20"></div>
                           )}
@@ -369,10 +380,11 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-8 items-center">
           <div>
             <div className="mb-6 inline-block">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img 
-                src="/logo.png" 
-                alt="Vida Gourmet" 
+              <Image
+                src="/logo.png"
+                alt="Vida Gourmet"
+                width={96}
+                height={96}
                 className="h-24 w-auto object-contain drop-shadow-md"
                 onError={(e) => {
                   e.currentTarget.style.display = 'none';
