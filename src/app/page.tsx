@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useCarrito } from '@/context/CarritoContext';
 import { createClient } from '@/lib/supabase-browser';
@@ -12,9 +12,6 @@ const SearchIcon = () => (
 );
 const CartIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg>
-);
-const UserIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
 );
 const StarIcon = () => (
   <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="#FFB592" stroke="#FFB592" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
@@ -36,7 +33,7 @@ export default function Home() {
   const [carritoAbierto, setCarritoAbierto] = useState(false);
   const [loading, setLoading] = useState(true);
   const { state, dispatch } = useCarrito();
-  const supabase = createClient();
+  const supabase = useMemo(() => createClient(), []);
 
   useEffect(() => {
     async function fetchData() {
@@ -50,7 +47,7 @@ export default function Home() {
       setLoading(false);
     }
     fetchData();
-  }, []);
+  }, [supabase]);
 
   const productosFiltrados = categoriaSeleccionada
     ? productos.filter(p => p.categoria_id === categoriaSeleccionada)
@@ -113,7 +110,7 @@ export default function Home() {
       <section className="relative z-10 max-w-7xl mx-auto px-6 pt-12 pb-24 grid md:grid-cols-2 gap-12 items-center">
         <div>
           <span className="inline-block px-4 py-1 bg-brand-peachLight text-brand-peach font-bold rounded-full text-sm mb-6 shadow-sm">
-            ¡Hambre?
+            ¿Hambre?
           </span>
           <h1 className="text-5xl md:text-6xl font-black text-gray-900 leading-tight mb-6">
             VEN Y DISFRUTA <br/> CON <span className="text-brand-peach">VIDA</span> <span className="font-cursive text-brand-olive font-normal text-6xl">Gourmet</span>
@@ -134,6 +131,7 @@ export default function Home() {
         {/* Hero Image */}
         <div className="relative flex justify-center">
           <div className="absolute w-[400px] h-[400px] bg-white/20 rounded-full blur-3xl"></div>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img 
             src="/hero_salad.png" 
             alt="Ensalada Saludable" 
@@ -196,6 +194,7 @@ export default function Home() {
                 {/* Circular image sticking out top */}
                 <div className="absolute -top-16 w-32 h-32 rounded-full border-[6px] border-white shadow-lg overflow-hidden bg-brand-peachLight/20">
                   {producto.imagen_url ? (
+                    /* eslint-disable-next-line @next/next/no-img-element */
                     <img src={producto.imagen_url} alt={producto.nombre} className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-brand-peach font-bold">Sin foto</div>
@@ -290,6 +289,7 @@ export default function Home() {
                       <div key={item.producto.id} className="flex gap-4 items-center">
                         <div className="w-16 h-16 rounded-2xl overflow-hidden bg-gray-100 shrink-0">
                           {item.producto.imagen_url ? (
+                            /* eslint-disable-next-line @next/next/no-img-element */
                             <img src={item.producto.imagen_url} alt={item.producto.nombre} className="w-full h-full object-cover" />
                           ) : (
                             <div className="w-full h-full bg-brand-peachLight/20"></div>
