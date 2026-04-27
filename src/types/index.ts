@@ -7,6 +7,16 @@ export type Categoria = {
   created_at: string;
 };
 
+export type OpcionMenuSemanal = {
+  id: string;
+  semana: string;
+  categoria: 'semanal' | 'proteico';
+  nombre_opcion: string;
+  descripcion: string | null;
+  activo: boolean;
+  created_at: string;
+};
+
 export type Producto = {
   id: string;
   categoria_id: string;
@@ -16,6 +26,7 @@ export type Producto = {
   imagen_url: string | null;
   activo: boolean;
   menu_semanal: boolean;
+  unidad_venta: string;
   created_at: string;
 };
 
@@ -65,3 +76,13 @@ export type CarritoItem = {
   producto: Producto;
   cantidad: number;
 };
+
+export type CarritoOpcion = {
+  tipo: 'semanal' | 'proteico';
+  opcion: OpcionMenuSemanal;
+  cantidad: number;
+};
+
+export type CarritoItemCompleto = CarritoItem | CarritoOpcion;
+
+export type CarritoState = CarritoItemCompleto[];

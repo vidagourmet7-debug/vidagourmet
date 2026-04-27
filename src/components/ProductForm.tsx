@@ -19,6 +19,7 @@ export type ProductoFormData = {
   imagen_url: string | null;
   activo: boolean;
   menu_semanal: boolean;
+  unidad_venta?: string;
 };
 
 export function ProductForm({ producto, categorias, onSave, onClose }: ProductFormProps) {
@@ -30,6 +31,7 @@ export function ProductForm({ producto, categorias, onSave, onClose }: ProductFo
     imagen_url: producto?.imagen_url || null,
     activo: producto?.activo ?? true,
     menu_semanal: producto?.menu_semanal ?? true,
+    unidad_venta: producto?.unidad_venta || 'unidad',
   });
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -101,6 +103,18 @@ export function ProductForm({ producto, categorias, onSave, onClose }: ProductFo
                 {categorias.map(cat => (
                   <option key={cat.id} value={cat.id}>{cat.nombre}</option>
                 ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-gray-700 font-medium mb-1">Unidad de venta</label>
+              <select
+                value={formData.unidad_venta || 'unidad'}
+                onChange={e => setFormData({ ...formData, unidad_venta: e.target.value })}
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-green-500"
+              >
+                <option value="unidad">Unidad</option>
+                <option value="pack x6">Pack x6</option>
               </select>
             </div>
 
