@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useReducer, useEffect, type ReactNode } from 'react';
 import type { Producto, OpcionMenuSemanal, CarritoItem, CarritoOpcion, CarritoItemCompleto } from '@/types';
-import { PRECIOS_MENU_SEMANAL, PRECIO_MENU_PROTEICO, calcularPrecioUnitarioSemanal, calcularEnvio } from '@/lib/pricing';
+import { PRECIO_MENU_PROTEICO, calcularPrecioUnitarioSemanal, calcularEnvio } from '@/lib/pricing';
 
 type CarritoState = CarritoItemCompleto[];
 

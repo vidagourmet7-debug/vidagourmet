@@ -57,7 +57,6 @@ function PrecioTierBadge() {
 
 function ShippingIndicator({ unidadesTotales, subtotal }: { unidadesTotales: number; subtotal: number }) {
   const unitsNeeded = 14 - unidadesTotales;
-  const montoNeeded = 105000 - subtotal;
 
   if (unidadesTotales >= 14 || subtotal >= 105000) {
     return (
@@ -216,8 +215,10 @@ export default function Home() {
 
         <div className="relative flex justify-center">
           <div className="absolute w-[400px] h-[400px] bg-white/20 rounded-full blur-3xl"></div>
-          <img src="/hero_salad.png" alt="Ensalada Saludable"
+          <Image src="/hero_salad.png" alt="Ensalada Saludable"
             className="w-full max-w-[500px] object-contain drop-shadow-2xl relative z-10 hover:scale-105 transition-transform duration-500"
+            width={500}
+            height={500}
             onError={(e) => { e.currentTarget.src = "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=600&h=600"; }}
           />
           <div className="absolute top-10 right-10 w-16 h-16 bg-white rounded-full shadow-xl flex items-center justify-center p-2 z-20 animate-bounce">

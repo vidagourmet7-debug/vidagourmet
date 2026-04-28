@@ -9,7 +9,7 @@ import { PRECIO_MENU_PROTEICO } from '@/lib/pricing';
 
 export default function Checkout() {
   const router = useRouter();
-  const { state, dispatch, info } = useCarrito();
+  const { dispatch, info } = useCarrito();
   const supabase = createClient();
   const [formData, setFormData] = useState({
     nombre: '',
