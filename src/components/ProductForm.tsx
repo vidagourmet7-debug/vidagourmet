@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import type { Producto, Categoria } from '@/types';
+import { uploadProductImage } from '@/lib/supabase-browser';
 
 type ProductFormProps = {
   producto?: Producto;
@@ -161,12 +162,15 @@ export function ProductForm({ producto, categorias, onSave, onClose }: ProductFo
                   const file = e.target.files?.[0];
                   if (!file) return;
                   setUploading(true);
-                  // Image upload handled by parent component
+                  const url = await uploadProductImage(file);
+                  if (url) {
+                    setFormData(prev => ({ ...prev, imagen_url: url }));
+                  }
                   setUploading(false);
                 }}
                 className="w-full border border-gray-300 rounded-lg px-4 py-2"
               />
-              {uploading && <p className="text-sm text-gray-500">Subiendo imagen...</p>}
+              {uploading && <p className="text-sm text-green-600">Subiendo imagen...</p>}
             </div>
 
             <div className="flex gap-3 pt-4">

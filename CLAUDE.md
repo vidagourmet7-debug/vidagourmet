@@ -26,17 +26,17 @@
 - [x] Deploy inicial en Vercel (https://vidagourmet.vercel.app/)
 
 ### Fase 2 - Tienda Pública
-- [ ] Página de inicio con categorías
-- [ ] Grilla de productos (foto/precio/descripción)
-- [ ] Carrito persistente (localStorage/Supabase)
-- [ ] Checkout (nombre, teléfono, dirección, día de entrega)
-- [ ] Confirmación con botón "Enviar por WhatsApp"
+- [x] Página de inicio con categorías
+- [x] Grilla de productos (foto/precio/descripción)
+- [x] Carrito persistente (localStorage/Supabase)
+- [x] Checkout (nombre, teléfono, dirección, día de entrega)
+- [x] Confirmación con botón "Enviar por WhatsApp"
 
 ### Fase 3 - Panel Admin (Productos)
-- [ ] Login protegido (Supabase Auth)
-- [ ] ABM productos (alta/baja/modificación)
-- [ ] Carga de fotos (Supabase Storage)
-- [ ] Menú semanal (publicar/despublicar por semana)
+- [x] Login protegido (Supabase Auth)
+- [x] ABM productos (alta/baja/modificación)
+- [x] Carga de fotos (Supabase Storage)
+- [x] Menú semanal (publicar/despublicar por semana)
 
 ### Fase 4 - Panel Admin (Pedidos)
 - [x] Vista de pedidos (día/semana)

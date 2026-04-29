@@ -52,6 +52,7 @@ function AdminProductosContent() {
           activo: data.activo,
           menu_semanal: data.menu_semanal,
           unidad_venta: data.unidad_venta || 'unidad',
+          imagen_url: data.imagen_url,
         })
         .eq('id', editProducto.id);
 
@@ -71,6 +72,7 @@ function AdminProductosContent() {
           activo: data.activo,
           menu_semanal: data.menu_semanal,
           unidad_venta: data.unidad_venta || 'unidad',
+          imagen_url: data.imagen_url,
         })
         .select()
         .single();
