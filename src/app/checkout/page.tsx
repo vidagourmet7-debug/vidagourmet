@@ -135,7 +135,7 @@ export default function Checkout() {
 
       if (formData.notas) mensaje += `%0A%0A*Notas:* ${formData.notas}`;
 
-      const telefonoWhatsApp = '5491163052490';
+      const telefonoWhatsApp = process.env.NEXT_PUBLIC_WHATSAPP_PHONE || '5491163052490';
       window.open(`https://wa.me/${telefonoWhatsApp}?text=${mensaje}`, '_blank');
 
       dispatch({ type: 'VACIAR' });

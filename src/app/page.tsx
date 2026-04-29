@@ -86,14 +86,20 @@ export default function Home() {
 
   useEffect(() => {
     async function fetchData() {
-      const currentWeekStart = '2026-04-20';
+      const today = new Date();
+      const dayOfWeek = today.getDay();
+      const mondayOffset = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+      const currentWeekStart = new Date(today);
+      currentWeekStart.setDate(today.getDate() + mondayOffset);
+      const weekStartStr = currentWeekStart.toISOString().split('T')[0];
+
       const [categoriasRes, productosRes, opcionesRes] = await Promise.all([
         supabase.from('categorias').select('*').eq('activo', true),
         supabase.from('productos').select('*').eq('activo', true),
         supabase.from('opciones_menu_semanal')
           .select('*')
           .eq('activo', true)
-          .eq('semana', currentWeekStart)
+          .eq('semana', weekStartStr)
           .order('categoria'),
       ]);
 
