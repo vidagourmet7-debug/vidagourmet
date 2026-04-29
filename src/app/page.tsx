@@ -85,6 +85,8 @@ export default function Home() {
   const supabase = useMemo(() => createClient(), []);
 
   useEffect(() => {
+    let mounted = true;
+
     async function fetchData() {
       const today = new Date();
       const dayOfWeek = today.getDay();
@@ -103,12 +105,28 @@ export default function Home() {
           .order('categoria'),
       ]);
 
-      if (categoriasRes.data) setCategorias(categoriasRes.data);
-      if (productosRes.data) setProductos(productosRes.data);
-      if (opcionesRes.data) setOpcionesMenu(opcionesRes.data);
-      setLoading(false);
+      if (mounted) {
+        if (categoriasRes.data) setCategorias(categoriasRes.data);
+        if (productosRes.data) setProductos(productosRes.data);
+        if (opcionesRes.data) setOpcionesMenu(opcionesRes.data);
+        setLoading(false);
+      }
     }
+
     fetchData();
+
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        fetchData();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibility);
+
+    return () => {
+      mounted = false;
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
   }, [supabase]);
 
   const opcionesSemanal = opcionesMenu.filter(o => o.categoria === 'semanal');
